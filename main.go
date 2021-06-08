@@ -1,12 +1,6 @@
 package main
 
 /*
-#cgo LDFLAGS: -L${SRCDIR}/c -lchar
-
-char **newchar(long long i);
-
-void setchar(char **c, long long index, char *s);
-
 typedef struct
 {
     char *Minecraftpath;
@@ -29,9 +23,12 @@ import "C"
 
 import (
 	"strconv"
+	"unsafe"
 
 	"github.com/xmdhs/gml-c-shared/gml"
 	"github.com/xmdhs/gomclauncher/launcher"
+
+	"github.com/xmdhs/gml-c-shared/c"
 )
 
 func main() {}
@@ -55,14 +52,14 @@ func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, int) {
 		return C.GameinfoReturn{}, 1
 	}
 
-	c := C.newchar(C.longlong(int64(len(args))))
+	c := c.NewChar(len(args))
 
 	for i, v := range args {
-		C.setchar(c, C.longlong(int64(i)), C.CString(v))
+		c.SetChar(i, unsafe.Pointer(C.CString(v)))
 	}
 
 	var r C.GameinfoReturn
-	r.args = c
+	r.args = (**C.char)(c.P)
 	r.len = C.longlong(int64(len(args)))
 	return r, 0
 }
