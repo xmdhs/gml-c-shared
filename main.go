@@ -22,10 +22,13 @@ typedef struct
 import "C"
 
 import (
+	"errors"
+	"os"
 	"strconv"
 	"unsafe"
 
 	"github.com/xmdhs/gml-c-shared/gml"
+	"github.com/xmdhs/gomclauncher/download"
 	"github.com/xmdhs/gomclauncher/launcher"
 
 	"github.com/xmdhs/gml-c-shared/c"
@@ -49,9 +52,9 @@ func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, int) {
 	}
 	args, err := l.GenCmdArgs()
 	if err != nil {
-		return C.GameinfoReturn{}, 1
+		i := errr(err)
+		return C.GameinfoReturn{}, i
 	}
-
 	c := c.NewChar(len(args))
 
 	for i, v := range args {
@@ -62,4 +65,21 @@ func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, int) {
 	r.args = (**C.char)(c.P)
 	r.len = C.longlong(int64(len(args)))
 	return r, 0
+}
+
+func errr(err error) int {
+	switch {
+	case errors.Is(err, os.ErrNotExist):
+		return 1
+	case errors.Is(err, launcher.JsonErr):
+		return 2
+	case errors.Is(err, launcher.JsonNorTrue):
+		return 3
+	case errors.Is(err, download.NoSuch):
+		return 4
+	case errors.Is(err, download.FileDownLoadFail):
+		return 5
+	default:
+		return -1
+	}
 }
