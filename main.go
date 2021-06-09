@@ -22,6 +22,12 @@ typedef struct
 typedef void (*Fail)(char*);
 
 typedef void (*Ok)(int,int);
+
+typedef struct
+{
+    int  code;
+    char *msg;
+} err;
 */
 import "C"
 
@@ -41,7 +47,7 @@ import (
 func main() {}
 
 //export GenCmdArgs
-func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, int) {
+func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, C.err) {
 	l := gml.Launcher{
 		Gameinfo: launcher.Gameinfo{
 			Minecraftpath: C.GoString(g.Minecraftpath),
@@ -68,43 +74,57 @@ func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, int) {
 	var r C.GameinfoReturn
 	r.args = (**C.char)(c.P)
 	r.len = C.longlong(int64(len(args)))
-	return r, 0
+	return r, errr(err)
 }
 
 //export Download
-func Download(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok C.Ok) int {
+func Download(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok C.Ok) C.err {
 	d := gml.NewDown(C.GoString(Type), C.GoString(Minecraftpath), int(downInt), c.DoFail(unsafe.Pointer(fail)), c.DoOk(unsafe.Pointer(ok)))
 	err := d.Download(C.GoString(version))
-	if err != nil {
-		return errr(err)
-	}
-	return 0
+	return errr(err)
 }
 
 //export Check
-func Check(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok C.Ok) int {
+func Check(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok C.Ok) C.err {
 	d := gml.NewDown(C.GoString(Type), C.GoString(Minecraftpath), int(downInt), c.DoFail(unsafe.Pointer(fail)), c.DoOk(unsafe.Pointer(ok)))
 	err := d.Check(C.GoString(version))
-	if err != nil {
-		return errr(err)
-	}
-	return 0
+	return errr(err)
 
 }
 
-func errr(err error) int {
+func errr(err error) C.err {
+	c := C.err{}
+
+	if err != nil {
+		c.code = 0
+		c.msg = nil
+		return c
+	}
+
 	switch {
 	case errors.Is(err, os.ErrNotExist):
-		return 1
+		c.code = 1
+		c.msg = C.CString(err.Error())
+		return c
 	case errors.Is(err, launcher.JsonErr):
-		return 2
+		c.code = 2
+		c.msg = C.CString(err.Error())
+		return c
 	case errors.Is(err, launcher.JsonNorTrue):
-		return 3
+		c.code = 3
+		c.msg = C.CString(err.Error())
+		return c
 	case errors.Is(err, download.NoSuch):
-		return 4
+		c.code = 4
+		c.msg = C.CString(err.Error())
+		return c
 	case errors.Is(err, download.FileDownLoadFail):
-		return 5
+		c.code = 5
+		c.msg = C.CString(err.Error())
+		return c
 	default:
-		return -1
+		c.code = -1
+		c.msg = C.CString(err.Error())
+		return c
 	}
 }
