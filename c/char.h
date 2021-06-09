@@ -11,4 +11,8 @@ char *getchar(char **c, long long index);
 
 void freechar(char **c,long long len);
 
+void do_Fail(void *f, char *c);
+
+void do_Ok(void *f, int i1, int i2);
+
 #endif

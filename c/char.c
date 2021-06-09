@@ -25,3 +25,17 @@ void freechar(char **c, long long len)
     }
     free(c);
 }
+
+void do_Fail(void *f, char *c)
+{
+    void (*Fail)(char *);
+    Fail = f;
+    Fail(c);
+}
+
+void do_Ok(void *f, int i1, int i2)
+{
+    void (*ok)(int, int);
+    ok = f;
+    ok(i1, i2);
+}

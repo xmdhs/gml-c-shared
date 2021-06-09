@@ -18,6 +18,10 @@ typedef struct
     char **args;
     long long len;
 } GameinfoReturn;
+
+typedef void (*Fail)(char*);
+
+typedef void (*Ok)(int,int);
 */
 import "C"
 
@@ -65,6 +69,27 @@ func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, int) {
 	r.args = (**C.char)(c.P)
 	r.len = C.longlong(int64(len(args)))
 	return r, 0
+}
+
+//export Download
+func Download(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok C.Ok) int {
+	d := gml.NewDown(C.GoString(Type), C.GoString(Minecraftpath), int(downInt), c.DoFail(unsafe.Pointer(fail)), c.DoOk(unsafe.Pointer(ok)))
+	err := d.Download(C.GoString(version))
+	if err != nil {
+		return errr(err)
+	}
+	return 0
+}
+
+//export Check
+func Check(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok C.Ok) int {
+	d := gml.NewDown(C.GoString(Type), C.GoString(Minecraftpath), int(downInt), c.DoFail(unsafe.Pointer(fail)), c.DoOk(unsafe.Pointer(ok)))
+	err := d.Check(C.GoString(version))
+	if err != nil {
+		return errr(err)
+	}
+	return 0
+
 }
 
 func errr(err error) int {
