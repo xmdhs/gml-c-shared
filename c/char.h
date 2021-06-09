@@ -9,6 +9,6 @@ void setchar(char **c, long long index, char *s);
 
 char *getchar(char **c, long long index);
 
-void freechar(char **c,long long int);
+void freechar(char **c,long long len);
 
 #endif
