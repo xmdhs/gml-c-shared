@@ -11,6 +11,9 @@ typedef struct
     char *Gamedir;
     char *Version;
     char *ApiAddress;
+	char **Flag;
+	int  flag_len;
+	int  independent;
 } Gameinfo;
 
 typedef struct
@@ -33,11 +36,14 @@ import "C"
 
 import (
 	"errors"
+	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"unsafe"
 
 	"github.com/xmdhs/gml-c-shared/gml"
+	"github.com/xmdhs/gomclauncher/auth"
 	"github.com/xmdhs/gomclauncher/download"
 	"github.com/xmdhs/gomclauncher/launcher"
 
@@ -48,6 +54,14 @@ func main() {}
 
 //export GenCmdArgs
 func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, C.err) {
+	Bool := g.independent == 1
+	flag := []string{}
+
+	for i := 0; i < int(g.flag_len); i++ {
+		c := Getchar(g.Flag, C.longlong(i))
+		flag = append(flag, C.GoString(c))
+	}
+
 	l := gml.Launcher{
 		Gameinfo: launcher.Gameinfo{
 			Minecraftpath: C.GoString(g.Minecraftpath),
@@ -57,8 +71,9 @@ func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, C.err) {
 			AccessToken:   C.GoString(g.AccessToken),
 			Version:       C.GoString(g.Version),
 			ApiAddress:    C.GoString(g.ApiAddress),
+			Flag:          flag,
 		},
-		Independent: false,
+		Independent: Bool,
 	}
 	args, err := l.GenCmdArgs()
 	if err != nil {
@@ -75,6 +90,17 @@ func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, C.err) {
 	r.args = (**C.char)(c.P)
 	r.len = C.longlong(int64(len(args)))
 	return r, errr(err)
+}
+
+//export SetProxy
+func SetProxy(httpProxy *C.char) C.err {
+	proxy, err := url.Parse(C.GoString(httpProxy))
+	if err != nil {
+		e := errr(err)
+		return e
+	}
+	auth.Transport.Proxy = http.ProxyURL(proxy)
+	return C.err{}
 }
 
 //export Download
@@ -127,31 +153,20 @@ func errr(err error) C.err {
 		c.msg = nil
 		return c
 	}
-
 	switch {
 	case errors.Is(err, os.ErrNotExist):
 		c.code = 1
-		c.msg = C.CString(err.Error())
-		return c
 	case errors.Is(err, launcher.JsonErr):
 		c.code = 2
-		c.msg = C.CString(err.Error())
-		return c
 	case errors.Is(err, launcher.JsonNorTrue):
 		c.code = 3
-		c.msg = C.CString(err.Error())
-		return c
 	case errors.Is(err, download.NoSuch):
 		c.code = 4
-		c.msg = C.CString(err.Error())
-		return c
 	case errors.Is(err, download.FileDownLoadFail):
 		c.code = 5
-		c.msg = C.CString(err.Error())
-		return c
 	default:
 		c.code = -1
-		c.msg = C.CString(err.Error())
-		return c
 	}
+	c.msg = C.CString(err.Error())
+	return c
 }
