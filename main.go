@@ -31,6 +31,15 @@ typedef struct
     int  code;
     char *msg;
 } err;
+
+typedef struct
+{
+    char *Username;
+    char *ClientToken;
+    char *UUID;
+    char *AccessToken;
+    char *ApiAddress;
+} OldAuth;
 */
 import "C"
 
@@ -145,6 +154,22 @@ func ListDownloadType(Type *C.char) (**C.char, C.err) {
 	return (**C.char)(c.P), C.err{}
 }
 
+//export OldAuth
+func OldAuth(ApiAddress, username, email, password, clientToken *C.char) (C.OldAuth, C.err) {
+	a, err := auth.Authenticate(C.GoString(ApiAddress), C.GoString(username), C.GoString(email), C.GoString(password), C.GoString(clientToken))
+	if err != nil {
+		e := errr(err)
+		return C.OldAuth{}, e
+	}
+	ca := C.OldAuth{}
+	ca.AccessToken = C.CString(a.AccessToken)
+	ca.ApiAddress = C.CString(a.ApiAddress)
+	ca.ClientToken = C.CString(a.ClientToken)
+	ca.UUID = C.CString(a.ID)
+	ca.Username = C.CString(a.Username)
+	return ca, C.err{}
+}
+
 func errr(err error) C.err {
 	c := C.err{}
 
@@ -164,6 +189,12 @@ func errr(err error) C.err {
 		c.code = 4
 	case errors.Is(err, download.FileDownLoadFail):
 		c.code = 5
+	case errors.Is(err, auth.ErrNotSelctProFile):
+		c.code = 6
+	case errors.Is(err, auth.ErrProFileNoExist):
+		c.code = 7
+	case errors.Is(err, auth.NotOk):
+		c.code = 8
 	default:
 		c.code = -1
 	}
