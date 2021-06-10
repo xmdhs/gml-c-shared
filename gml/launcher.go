@@ -31,21 +31,24 @@ func (f *Launcher) GenCmdArgs() ([]string, error) {
 	return args, nil
 }
 
-func ListVersion(path string) []string {
-	l := find(path)
+func ListVersion(path string) ([]string, error) {
+	l, err := find(path)
+	if err != nil {
+		return nil, fmt.Errorf("ListVersion: %w", err)
+	}
 	rl := make([]string, 0, len(l))
 	for _, v := range l {
 		if testVersion(path + "/" + v + `/` + v + ".json") {
 			rl = append(rl, v)
 		}
 	}
-	return rl
+	return rl, nil
 }
 
-func find(path string) []string {
+func find(path string) ([]string, error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("find: %w", err)
 	}
 	s := make([]string, 0)
 	for _, f := range files {
@@ -53,7 +56,7 @@ func find(path string) []string {
 			s = append(s, f.Name())
 		}
 	}
-	return s
+	return s, nil
 }
 
 func testVersion(path string) bool {

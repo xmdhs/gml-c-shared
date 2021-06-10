@@ -157,3 +157,37 @@ b:
 	}
 	return nil
 }
+
+func ListDownloadType(Type string) ([]string, error) {
+	l, err := download.Getversionlist(context.TODO(), Type, func(s string) {})
+	if err != nil {
+		return nil, fmt.Errorf("ListDownloadType: %w", err)
+	}
+	m := make(map[string]struct{})
+	for _, v := range l.Versions {
+		m[v.Type] = struct{}{}
+	}
+
+	list := make([]string, 0, len(m))
+
+	for k := range m {
+		list = append(list, k)
+	}
+	return list, nil
+}
+
+func ListDownloadVersion(VerType, Type string) ([]string, error) {
+	l, err := download.Getversionlist(context.Background(), Type, func(s string) {})
+	if err != nil {
+		return nil, fmt.Errorf("ListDownloadVersion: %w", err)
+	}
+	list := []string{}
+
+	for _, v := range l.Versions {
+		if v.Type == VerType {
+			list = append(list, v.ID)
+		}
+	}
+
+	return list, nil
+}

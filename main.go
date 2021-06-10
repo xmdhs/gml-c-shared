@@ -92,13 +92,31 @@ func Check(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok 
 }
 
 //export ListVersion
-func ListVersion(path *C.char) **C.char {
-	l := gml.ListVersion(C.GoString(path))
+func ListVersion(path *C.char) (**C.char, C.err) {
+	l, err := gml.ListVersion(C.GoString(path))
+	if err != nil {
+		e := errr(err)
+		return nil, e
+	}
 	c := c.NewChar(len(l))
 	for i, v := range l {
 		c.SetChar(i, unsafe.Pointer(C.CString(v)))
 	}
-	return (**C.char)(c.P)
+	return (**C.char)(c.P), C.err{}
+}
+
+//export ListDownloadType
+func ListDownloadType(Type *C.char) (**C.char, C.err) {
+	l, err := gml.ListDownloadType(C.GoString(Type))
+	if err != nil {
+		e := errr(err)
+		return nil, e
+	}
+	c := c.NewChar(len(l))
+	for i, v := range l {
+		c.SetChar(i, unsafe.Pointer(C.CString(v)))
+	}
+	return (**C.char)(c.P), C.err{}
 }
 
 func errr(err error) C.err {
