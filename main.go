@@ -89,7 +89,16 @@ func Check(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok 
 	d := gml.NewDown(C.GoString(Type), C.GoString(Minecraftpath), int(downInt), c.DoFail(unsafe.Pointer(fail)), c.DoOk(unsafe.Pointer(ok)))
 	err := d.Check(C.GoString(version))
 	return errr(err)
+}
 
+//export ListVersion
+func ListVersion(path *C.char) **C.char {
+	l := gml.ListVersion(C.GoString(path))
+	c := c.NewChar(len(l))
+	for i, v := range l {
+		c.SetChar(i, unsafe.Pointer(C.CString(v)))
+	}
+	return (**C.char)(c.P)
 }
 
 func errr(err error) C.err {
