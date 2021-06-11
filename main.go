@@ -8,7 +8,6 @@ typedef struct
     char *Name;
     char *UUID;
     char *AccessToken;
-    char *Gamedir;
     char *Version;
     char *ApiAddress;
 	char **Flag;
@@ -21,7 +20,6 @@ typedef struct
     int  code;
     char *msg;
 } err;
-
 
 typedef struct
 {
@@ -82,6 +80,12 @@ func GenCmdArgs(g C.Gameinfo) C.GmlReturn {
 		c := Getchar(g.Flag, C.longlong(i))
 		flag = append(flag, C.GoString(c))
 	}
+	apiAddress, cond0, _, ret1 := getApiAddress(g.ApiAddress)
+	if cond0 {
+		c := C.GmlReturn{}
+		c.e = ret1
+		return c
+	}
 
 	l := gml.Launcher{
 		Gameinfo: launcher.Gameinfo{
@@ -91,7 +95,7 @@ func GenCmdArgs(g C.Gameinfo) C.GmlReturn {
 			UUID:          C.GoString(g.UUID),
 			AccessToken:   C.GoString(g.AccessToken),
 			Version:       C.GoString(g.Version),
-			ApiAddress:    C.GoString(g.ApiAddress),
+			ApiAddress:    apiAddress,
 			Flag:          flag,
 		},
 		Independent: Bool,
@@ -177,11 +181,11 @@ func list(err error, l []string) C.GmlReturn {
 
 //export Auth
 func Auth(ApiAddress, username, email, password, clientToken *C.char) (C.AuthDate, C.err) {
-	apiAddress, err := auth.Getauthlibapi(C.GoString(ApiAddress))
-	if err != nil {
-		e := errr(err)
-		return C.AuthDate{}, e
+	apiAddress, cond0, ret0, ret1 := getApiAddress(ApiAddress)
+	if cond0 {
+		return ret0, ret1
 	}
+
 	a, err := auth.Authenticate(apiAddress, C.GoString(username), C.GoString(email), C.GoString(password), C.GoString(clientToken))
 	if err != nil {
 		e := errr(err)
@@ -196,15 +200,36 @@ func Auth(ApiAddress, username, email, password, clientToken *C.char) (C.AuthDat
 	return ca, C.err{}
 }
 
+func getApiAddress(ApiAddress *C.char) (string, bool, C.AuthDate, C.err) {
+	apiAddress := "https://authserver.mojang.com"
+	if C.GoString(ApiAddress) != "" {
+		var err error
+		apiAddress, err = auth.Getauthlibapi(C.GoString(ApiAddress))
+		if err != nil {
+			e := errr(err)
+			return "", true, C.AuthDate{}, e
+		}
+	}
+	return apiAddress, false, C.AuthDate{}, C.err{}
+}
+
 //export Validate
-func Validate(AccessToken, ClientToken *C.char) C.err {
-	err := auth.Validate(auth.Auth{AccessToken: C.GoString(AccessToken), ClientToken: C.GoString(ClientToken)})
+func Validate(AccessToken, ClientToken, ApiAddress *C.char) C.err {
+	apiAddress, cond0, _, ret1 := getApiAddress(ApiAddress)
+	if cond0 {
+		return ret1
+	}
+	err := auth.Validate(auth.Auth{AccessToken: C.GoString(AccessToken), ClientToken: C.GoString(ClientToken), ApiAddress: apiAddress})
 	return errr(err)
 }
 
 //export Refresh
 func Refresh(AccessToken, ClientToken, ApiAddress *C.char) (C.AuthDate, C.err) {
-	a := auth.Auth{AccessToken: C.GoString(AccessToken), ClientToken: C.GoString(ClientToken), ApiAddress: C.GoString(ApiAddress)}
+	apiAddress, cond0, ret0, ret1 := getApiAddress(ApiAddress)
+	if cond0 {
+		return ret0, ret1
+	}
+	a := auth.Auth{AccessToken: C.GoString(AccessToken), ClientToken: C.GoString(ClientToken), ApiAddress: apiAddress}
 	err := auth.Refresh(&a)
 	if err != nil {
 		return C.AuthDate{}, errr(err)
