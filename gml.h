@@ -95,6 +95,7 @@ extern err SetProxy(char* httpProxy);
 //version 下载版本，可通过 ListDownloadVersion 查找可下载的版本
 //Type 下载使用的下载源，留空将按照权重的随机使用三个下载源，也可以自行设置。例如 vanilla|bmclapi 表示随机使用原版下载源和 bmclapi 下载源。mcbbs 表示只使用 mcbbs 下载源
 //Minecraftpath 下载的路径，例如 D:/mc/.minecraft
+//downInt 下载使用的协程数，通常 64 即可，因为每一个文件只使用了一个协程，多了虽然性能上没啥问题但是没意义。
 extern err Download(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok);
 //检查游戏的完整性，第一次某个版本时，必须检查一次。
 extern err Check(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok);
