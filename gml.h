@@ -1,5 +1,8 @@
 //仅作注释用，不要导入此文件
 
+
+//char* 均使用 utf-8 编码
+
 typedef struct
 {
     //游戏路径，需要创建一个 .minecraft 文件夹，例如 D:/mc/.minecraft
