@@ -39,7 +39,7 @@ typedef struct
     char *UUID;
     char *AccessToken;
     char *ApiAddress;
-} OldAuth;
+} OldAuthDate;
 */
 import "C"
 
@@ -155,13 +155,18 @@ func ListDownloadType(Type *C.char) (**C.char, C.err) {
 }
 
 //export OldAuth
-func OldAuth(ApiAddress, username, email, password, clientToken *C.char) (C.OldAuth, C.err) {
-	a, err := auth.Authenticate(C.GoString(ApiAddress), C.GoString(username), C.GoString(email), C.GoString(password), C.GoString(clientToken))
+func OldAuth(ApiAddress, username, email, password, clientToken *C.char) (C.OldAuthDate, C.err) {
+	apiAddress, err := auth.Getauthlibapi(C.GoString(ApiAddress))
 	if err != nil {
 		e := errr(err)
-		return C.OldAuth{}, e
+		return C.OldAuthDate{}, e
 	}
-	ca := C.OldAuth{}
+	a, err := auth.Authenticate(apiAddress, C.GoString(username), C.GoString(email), C.GoString(password), C.GoString(clientToken))
+	if err != nil {
+		e := errr(err)
+		return C.OldAuthDate{}, e
+	}
+	ca := C.OldAuthDate{}
 	ca.AccessToken = C.CString(a.AccessToken)
 	ca.ApiAddress = C.CString(a.ApiAddress)
 	ca.ClientToken = C.CString(a.ClientToken)
