@@ -18,19 +18,22 @@ typedef struct
 
 typedef struct
 {
-    char **args;
-    long long len;
-} GameinfoReturn;
+    int  code;
+    char *msg;
+} err;
+
+
+typedef struct
+{
+    char **charlist;
+    int len;
+	err e;
+
+} GmlReturn;
 
 typedef void (*Fail)(char*);
 
 typedef void (*Ok)(int,int);
-
-typedef struct
-{
-    int  code;
-    char *msg;
-} err;
 
 typedef struct
 {
@@ -62,7 +65,7 @@ import (
 func main() {}
 
 //export GenCmdArgs
-func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, C.err) {
+func GenCmdArgs(g C.Gameinfo) C.GmlReturn {
 	Bool := g.independent == 1
 	flag := []string{}
 
@@ -87,7 +90,9 @@ func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, C.err) {
 	args, err := l.GenCmdArgs()
 	if err != nil {
 		i := errr(err)
-		return C.GameinfoReturn{}, i
+		c := C.GmlReturn{}
+		c.e = i
+		return c
 	}
 	c := c.NewChar(len(args))
 
@@ -95,10 +100,10 @@ func GenCmdArgs(g C.Gameinfo) (C.GameinfoReturn, C.err) {
 		c.SetChar(i, unsafe.Pointer(C.CString(v)))
 	}
 
-	var r C.GameinfoReturn
-	r.args = (**C.char)(c.P)
-	r.len = C.longlong(int64(len(args)))
-	return r, errr(err)
+	var r C.GmlReturn
+	r.charlist = (**C.char)(c.P)
+	r.len = C.int(len(args))
+	return r
 }
 
 //export SetProxy
@@ -127,32 +132,38 @@ func Check(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok 
 }
 
 //export ListVersion
-func ListVersion(path *C.char) (**C.char, C.int, C.err) {
+func ListVersion(path *C.char) C.GmlReturn {
 	l, err := gml.ListVersion(C.GoString(path))
 	return list(err, l)
 }
 
 //export ListDownloadType
-func ListDownloadType(Type *C.char) (**C.char, C.int, C.err) {
+func ListDownloadType(Type *C.char) C.GmlReturn {
 	l, err := gml.ListDownloadType(C.GoString(Type))
 	return list(err, l)
 }
 
-func ListDownloadVersion(VerType, Type *C.char) (**C.char, C.int, C.err) {
+//export ListDownloadVersion
+func ListDownloadVersion(VerType, Type *C.char) C.GmlReturn {
 	l, err := gml.ListDownloadVersion(C.GoString(VerType), C.GoString(Type))
 	return list(err, l)
 }
 
-func list(err error, l []string) (**C.char, C.int, C.err) {
+func list(err error, l []string) C.GmlReturn {
 	if err != nil {
 		e := errr(err)
-		return nil, 0, e
+		c := C.GmlReturn{}
+		c.e = e
+		return c
 	}
 	c := c.NewChar(len(l))
 	for i, v := range l {
 		c.SetChar(i, unsafe.Pointer(C.CString(v)))
 	}
-	return (**C.char)(c.P), C.int(len(l)), C.err{}
+	r := C.GmlReturn{}
+	r.charlist = (**C.char)(c.P)
+	r.len = C.int(len(l))
+	return r
 }
 
 //export OldAuth
