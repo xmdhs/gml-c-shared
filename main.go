@@ -42,7 +42,14 @@ typedef struct
     char *UUID;
     char *AccessToken;
     char *ApiAddress;
-} OldAuthDate;
+} AuthDate;
+
+typedef struct
+{
+    char *Username;
+    char *UUID;
+    char *AccessToken;
+} MsAuthDate;
 */
 import "C"
 
@@ -60,6 +67,8 @@ import (
 	"github.com/xmdhs/gomclauncher/launcher"
 
 	"github.com/xmdhs/gml-c-shared/c"
+
+	msauth "github.com/xmdhs/msauth/auth"
 )
 
 func main() {}
@@ -166,25 +175,68 @@ func list(err error, l []string) C.GmlReturn {
 	return r
 }
 
-//export OldAuth
-func OldAuth(ApiAddress, username, email, password, clientToken *C.char) (C.OldAuthDate, C.err) {
+//export Auth
+func Auth(ApiAddress, username, email, password, clientToken *C.char) (C.AuthDate, C.err) {
 	apiAddress, err := auth.Getauthlibapi(C.GoString(ApiAddress))
 	if err != nil {
 		e := errr(err)
-		return C.OldAuthDate{}, e
+		return C.AuthDate{}, e
 	}
 	a, err := auth.Authenticate(apiAddress, C.GoString(username), C.GoString(email), C.GoString(password), C.GoString(clientToken))
 	if err != nil {
 		e := errr(err)
-		return C.OldAuthDate{}, e
+		return C.AuthDate{}, e
 	}
-	ca := C.OldAuthDate{}
+	ca := C.AuthDate{}
 	ca.AccessToken = C.CString(a.AccessToken)
 	ca.ApiAddress = C.CString(a.ApiAddress)
 	ca.ClientToken = C.CString(a.ClientToken)
 	ca.UUID = C.CString(a.ID)
 	ca.Username = C.CString(a.Username)
 	return ca, C.err{}
+}
+
+//export Validate
+func Validate(AccessToken, ClientToken *C.char) C.err {
+	err := auth.Validate(auth.Auth{AccessToken: C.GoString(AccessToken), ClientToken: C.GoString(ClientToken)})
+	return errr(err)
+}
+
+//export Refresh
+func Refresh(AccessToken, ClientToken, ApiAddress *C.char) (C.AuthDate, C.err) {
+	a := auth.Auth{AccessToken: C.GoString(AccessToken), ClientToken: C.GoString(ClientToken), ApiAddress: C.GoString(ApiAddress)}
+	err := auth.Refresh(&a)
+	if err != nil {
+		return C.AuthDate{}, errr(err)
+	}
+	ca := C.AuthDate{}
+	ca.AccessToken = C.CString(a.AccessToken)
+	ca.ApiAddress = C.CString(a.ApiAddress)
+	ca.ClientToken = C.CString(a.ClientToken)
+	ca.UUID = C.CString(a.ID)
+	ca.Username = C.CString(a.Username)
+	return ca, C.err{}
+}
+
+func MsAuth() (C.MsAuthDate, C.err) {
+	p, err := auth.MsLogin()
+	return msdo(err, p)
+}
+
+func MsAuthValidate(AccessToken *C.char) (C.MsAuthDate, C.err) {
+	p, err := auth.GetProfile(C.GoString(AccessToken))
+	return msdo(err, p)
+}
+
+func msdo(err error, p *auth.Profile) (C.MsAuthDate, C.err) {
+	if err != nil {
+		return C.MsAuthDate{}, errr(err)
+	}
+	m := C.MsAuthDate{}
+	m.AccessToken = C.CString(p.AccessToken)
+	m.UUID = C.CString(p.ID)
+	m.Username = C.CString(p.Name)
+	return m, C.err{}
 }
 
 func errr(err error) C.err {
@@ -214,6 +266,16 @@ func errr(err error) C.err {
 		c.code = 8
 	case errors.Is(err, auth.NoProfiles):
 		c.code = 9
+	case errors.Is(err, auth.AccessTokenCanNotUse):
+		c.code = 10
+	case errors.Is(err, msauth.ErrHostname):
+		c.code = 11
+	case errors.Is(err, auth.ErrCode):
+		c.code = 12
+	case errors.Is(err, auth.ErrProfile):
+		c.code = 13
+	case errors.Is(err, msauth.ErrNotInstallChrome):
+		c.code = 14
 	default:
 		c.code = -1
 	}
