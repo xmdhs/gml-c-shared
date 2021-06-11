@@ -218,11 +218,13 @@ func Refresh(AccessToken, ClientToken, ApiAddress *C.char) (C.AuthDate, C.err) {
 	return ca, C.err{}
 }
 
+//export MsAuth
 func MsAuth() (C.MsAuthDate, C.err) {
 	p, err := auth.MsLogin()
 	return msdo(err, p)
 }
 
+//export MsAuthValidate
 func MsAuthValidate(AccessToken *C.char) (C.MsAuthDate, C.err) {
 	p, err := auth.GetProfile(C.GoString(AccessToken))
 	return msdo(err, p)
