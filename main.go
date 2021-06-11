@@ -127,44 +127,32 @@ func Check(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok 
 }
 
 //export ListVersion
-func ListVersion(path *C.char) (**C.char, C.err) {
+func ListVersion(path *C.char) (**C.char, C.int, C.err) {
 	l, err := gml.ListVersion(C.GoString(path))
-	if err != nil {
-		e := errr(err)
-		return nil, e
-	}
-	c := c.NewChar(len(l))
-	for i, v := range l {
-		c.SetChar(i, unsafe.Pointer(C.CString(v)))
-	}
-	return (**C.char)(c.P), C.err{}
+	return list(err, l)
 }
 
 //export ListDownloadType
-func ListDownloadType(Type *C.char) (**C.char, C.err) {
+func ListDownloadType(Type *C.char) (**C.char, C.int, C.err) {
 	l, err := gml.ListDownloadType(C.GoString(Type))
-	if err != nil {
-		e := errr(err)
-		return nil, e
-	}
-	c := c.NewChar(len(l))
-	for i, v := range l {
-		c.SetChar(i, unsafe.Pointer(C.CString(v)))
-	}
-	return (**C.char)(c.P), C.err{}
+	return list(err, l)
 }
 
-func ListDownloadVersion(VerType, Type *C.char) (**C.char, C.err) {
+func ListDownloadVersion(VerType, Type *C.char) (**C.char, C.int, C.err) {
 	l, err := gml.ListDownloadVersion(C.GoString(VerType), C.GoString(Type))
+	return list(err, l)
+}
+
+func list(err error, l []string) (**C.char, C.int, C.err) {
 	if err != nil {
 		e := errr(err)
-		return nil, e
+		return nil, 0, e
 	}
 	c := c.NewChar(len(l))
 	for i, v := range l {
 		c.SetChar(i, unsafe.Pointer(C.CString(v)))
 	}
-	return (**C.char)(c.P), C.err{}
+	return (**C.char)(c.P), C.int(len(l)), C.err{}
 }
 
 //export OldAuth
