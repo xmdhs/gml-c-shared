@@ -154,6 +154,19 @@ func ListDownloadType(Type *C.char) (**C.char, C.err) {
 	return (**C.char)(c.P), C.err{}
 }
 
+func ListDownloadVersion(VerType, Type *C.char) (**C.char, C.err) {
+	l, err := gml.ListDownloadVersion(C.GoString(VerType), C.GoString(Type))
+	if err != nil {
+		e := errr(err)
+		return nil, e
+	}
+	c := c.NewChar(len(l))
+	for i, v := range l {
+		c.SetChar(i, unsafe.Pointer(C.CString(v)))
+	}
+	return (**C.char)(c.P), C.err{}
+}
+
 //export OldAuth
 func OldAuth(ApiAddress, username, email, password, clientToken *C.char) (C.OldAuthDate, C.err) {
 	apiAddress, err := auth.Getauthlibapi(C.GoString(ApiAddress))
