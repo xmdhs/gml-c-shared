@@ -244,7 +244,7 @@ func msdo(err error, p *auth.Profile) (C.MsAuthDate, C.err) {
 func errr(err error) C.err {
 	c := C.err{}
 
-	if err != nil {
+	if err == nil {
 		c.code = 0
 		c.msg = nil
 		return c
