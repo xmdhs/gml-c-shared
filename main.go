@@ -212,6 +212,8 @@ func errr(err error) C.err {
 		c.code = 7
 	case errors.Is(err, auth.NotOk):
 		c.code = 8
+	case errors.Is(err, auth.NoProfiles):
+		c.code = 9
 	default:
 		c.code = -1
 	}
