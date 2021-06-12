@@ -27,7 +27,7 @@ jobs:
         curl https://musl.cc/x86_64-linux-musl-native.tgz > /tmp/x86_64-linux-musl-cross.tgz
         tar zxf /tmp/x86_64-linux-musl-cross.tgz -C /tmp
         curl https://musl.cc/x86_64-w64-mingw32-cross.tgz > /tmp/x86_64-w64-mingw32-cross.tgz
-        tar zxf /tmp/x86_64-w64-mingw32-cross -C /tmp
+        tar zxf /tmp/x86_64-w64-mingw32-cross.tgz -C /tmp
     - name: Build
       run:  |
         export PATH=$PATH:/tmp/x86_64-linux-musl-native/bin
@@ -41,13 +41,13 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
        name: linux
-       path: ./linux
+       path: ./linux/*
     
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v2
       with:
        name: windows
-       path: ./windows
+       path: ./windows/*
    
     - name: clean
       run:  |
