@@ -46,7 +46,4 @@ jobs:
        name: windows
        path: ./windows/*
    
-    - name: clean
-      run:  |
-        rm -rf /tmp/*
      
