@@ -139,6 +139,11 @@ https://bmclapidoc.bangbang93.com/
         char *UUID;
         char *AccessToken;
         char *ApiAddress;
+        //可用的用户名，当 Auth 返回 6 错误时，可以选择此列表中的用户名，设置在 Auth 的 username 参数上，来选择档案。
+        //只有外置登录有单账号，多档案。
+        char **availableProfiles;
+        //长度
+        int availableProfilesLen;
     } AuthDate;
 
     typedef struct
@@ -193,6 +198,7 @@ https://bmclapidoc.bangbang93.com/
     //外置登录和正版登录
     //clientToken 客户端 id，可随机生成，需保证每个用户对应的 ClientToken 是不变的，否则会要求重新登录。建议直接 md5 用户名就行。
     //ApiAddress 可不输入完整的 api 地址，会按照协议补全，如果正版登录，则无需设置此项。
+    //username 外置登录时需要，具体见 AuthDate 处的注释
     extern struct Auth_return Auth(char* ApiAddress, char* username, char* email, char* password, char* clientToken);
     //验证 AccessToken 的有效性，建议每次启动游戏前，都验证一次
     extern err Validate(char* AccessToken, char* ClientToken, char* ApiAddress);

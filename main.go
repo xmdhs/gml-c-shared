@@ -42,6 +42,8 @@ typedef struct
     char *UUID;
     char *AccessToken;
     char *ApiAddress;
+	char **availableProfiles;
+	int availableProfilesLen;
 } AuthDate;
 
 typedef struct
@@ -215,7 +217,44 @@ func Auth(ApiAddress, username, email, password, clientToken *C.char) (C.AuthDat
 	ca.ClientToken = C.CString(a.ClientToken)
 	ca.UUID = C.CString(a.ID)
 	ca.Username = C.CString(a.Username)
+
+	adate := (*authdate)(unsafe.Pointer(&a))
+	list := c.NewChar(len(adate.availableProfiles))
+	for i, v := range adate.availableProfiles {
+		list.SetChar(i, unsafe.Pointer(C.CString(v.Name)))
+	}
+	ca.availableProfiles = (**C.char)(list.P)
+	ca.availableProfilesLen = C.int(len(adate.availableProfiles))
+
 	return ca, C.err{}
+}
+
+type authdate struct {
+	Username          string
+	ClientToken       string
+	ID                string
+	AccessToken       string
+	selectedProfile   sElectedProfile
+	ApiAddress        string
+	availableProfiles []authenticateResponseAvailableProfile
+}
+
+type authenticateResponseAvailableProfile struct {
+	Agent         string  `json:"agent"`
+	CreatedAt     float64 `json:"createdAt"`
+	ID            string  `json:"id"`
+	Legacy        bool    `json:"legacy"`
+	LegacyProfile bool    `json:"legacyProfile"`
+	Migrated      bool    `json:"migrated"`
+	Name          string  `json:"name"`
+	Paid          bool    `json:"paid"`
+	Suspended     bool    `json:"suspended"`
+	UserID        string  `json:"userId"`
+}
+
+type sElectedProfile struct {
+	Name string `json:"name"`
+	ID   string `json:"id"`
 }
 
 func getApiAddress(ApiAddress *C.char) (string, bool, C.AuthDate, C.err) {
