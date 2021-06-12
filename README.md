@@ -88,6 +88,7 @@ https://bmclapidoc.bangbang93.com/
     /*code | msg
     -----|----------------------------------------------
     -1   | 未知错误
+    0    | 正常
     1    | 文件不存在
     2    | json 错误
     3    | minecraft json 格式错误
