@@ -1,5 +1,8 @@
 //仅作注释用，不要导入此文件
 
+
+//char* 均使用 utf-8 编码
+
 typedef struct
 {
     //游戏路径，需要创建一个 .minecraft 文件夹，例如 D:/mc/.minecraft
@@ -97,9 +100,12 @@ extern err SetProxy(char* httpProxy);
 //下载游戏
 //version 下载版本，可通过 ListDownloadVersion 查找可下载的版本
 //Type 下载使用的下载源，留空将按照权重的随机使用三个下载源，也可以自行设置。例如 vanilla|bmclapi 表示随机使用原版下载源和 bmclapi 下载源。mcbbs 表示只使用 mcbbs 下载源
+//downInt 下载协程数，通常 64 即可，因为一个文件还是使用一个协程下载，多了没意义
 //Minecraftpath 下载的路径，例如 D:/mc/.minecraft
 //调用后将立刻返回一个 int64，可以使用 Cancel 函数，将此 int64 传入，取消下载操
 extern long long int Download(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok, gmlfinish finish);
+//downInt 下载使用的协程数，通常 64 即可，因为每一个文件只使用了一个协程，多了虽然性能上没啥问题但是没意义。
+extern err Download(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok);
 //检查游戏的完整性，第一次某个版本时，必须检查一次。
 extern long long int Check(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok, gmlfinish finish);
 //取消下载或者检查游戏完整性
