@@ -150,6 +150,7 @@ struct Auth_return {
 //clientToken 客户端 id，可随机生成，需保证每个用户对应的 ClientToken 是不变的，否则会要求重新登录。建议直接 md5 用户名就行。
 //ApiAddress 可不输入完整的 api 地址，会按照协议补全，如果正版登录，则无需设置此项。
 //username 外置登录时需要，具体见 AuthDate 处的注释
+//不要保存密码，保存 AccessToken
 extern struct Auth_return Auth(char* ApiAddress, char* username, char* email, char* password, char* clientToken);
 //验证 AccessToken 的有效性，建议每次启动游戏前，都验证一次
 extern err Validate(char* AccessToken, char* ClientToken, char* ApiAddress);

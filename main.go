@@ -205,12 +205,7 @@ func Auth(ApiAddress, username, email, password, clientToken *C.char) (C.AuthDat
 	if cond0 {
 		return ret0, ret1
 	}
-
 	a, err := auth.Authenticate(apiAddress, C.GoString(username), C.GoString(email), C.GoString(password), C.GoString(clientToken))
-	if err != nil {
-		e := errr(err)
-		return C.AuthDate{}, e
-	}
 	ca := C.AuthDate{}
 	ca.AccessToken = C.CString(a.AccessToken)
 	ca.ApiAddress = C.CString(a.ApiAddress)
@@ -225,8 +220,7 @@ func Auth(ApiAddress, username, email, password, clientToken *C.char) (C.AuthDat
 	}
 	ca.availableProfiles = (**C.char)(list.P)
 	ca.availableProfilesLen = C.int(len(adate.availableProfiles))
-
-	return ca, C.err{}
+	return ca, errr(err)
 }
 
 type authdate struct {

@@ -201,6 +201,7 @@ https://bmclapidoc.bangbang93.com/
     //clientToken 客户端 id，可随机生成，需保证每个用户对应的 ClientToken 是不变的，否则会要求重新登录。建议直接 md5 用户名就行。
     //ApiAddress 可不输入完整的 api 地址，会按照协议补全，如果正版登录，则无需设置此项。
     //username 外置登录时需要，具体见 AuthDate 处的注释
+    //不要保存密码，保存 AccessToken
     extern struct Auth_return Auth(char* ApiAddress, char* username, char* email, char* password, char* clientToken);
     //验证 AccessToken 的有效性，建议每次启动游戏前，都验证一次
     extern err Validate(char* AccessToken, char* ClientToken, char* ApiAddress);
@@ -235,6 +236,7 @@ https://bmclapidoc.bangbang93.com/
 
 ## 示例
 使用 java，用 jna 库调用，简单的下载游戏和启动。
+
 
     import com.sun.jna.*;
 
@@ -322,6 +324,28 @@ https://bmclapidoc.bangbang93.com/
             }
         }
 
+        public static class AuthDate extends Structure implements Structure.ByValue {
+            public Pointer Username;
+            public Pointer ClientToken;
+            public Pointer UUID;
+            public Pointer AccessToken;
+            public Pointer ApiAddress;
+            public Pointer availableProfiles;
+            public int availableProfilesLen;
+
+            protected List<String> getFieldOrder() {
+                return Arrays.asList("Username", "ClientToken", "UUID", "AccessToken", "ApiAddress", "availableProfiles", "availableProfilesLen");
+            }
+        }
+
+        public static class Auth_return extends Structure implements Structure.ByValue {
+            public AuthDate r0;
+            public GoErr r1;
+
+            protected List<String> getFieldOrder() {
+                return Arrays.asList("r0", "r1");
+            }
+        }
 
         public interface Lib extends Library {
 
@@ -340,6 +364,8 @@ https://bmclapidoc.bangbang93.com/
             void Freechar(Pointer cc, long len);
 
             Pointer Malloc(int i);
+
+            Auth_return Auth(Pointer ApiAddress, Pointer username, Pointer email, Pointer password, Pointer clientToken);
         }
 
         public static class Gameinfo extends Structure implements Structure.ByValue {
@@ -382,17 +408,25 @@ https://bmclapidoc.bangbang93.com/
         static finish finish = new f3();
 
         public static void main(String[] args) throws InterruptedException, IOException {
-            Pointer a1 = String2char("1.0");
+            Auth_return ar = Lib.INSTANCE.Auth(String2char(""), String2char(""),
+                    String2char("xmdhss@gmail.com"), String2char("Aaaa"),
+                    String2char("123"));
+            if (ar.r1.r0 != 0){
+                System.out.println(ar.r1.r1.getString(0,"UTF-8"));
+                return;
+            }
+
+            Pointer a1 = String2char("1.17");
             Lib.INSTANCE.Download(a1, String2char(""), String2char("C:/Users/xmdhs/Desktop/新建文件夹/.minecraft"),
                     64, fail, ok, finish);
             //其实通过 String2char 创建的字符串，都需要用 Freechar 释放，但是这里偷懒了，反正进程结束也会释放。
-            Lib.INSTANCE.Freechar(a1,0);
+            Lib.INSTANCE.Freechar(a1, 0);
             lock.lock();
             condition.await();
             lock.unlock();
 
             Gameinfo g = new Gameinfo();
-            g.AccessToken = String2char("aaa");
+            g.AccessToken = ar.r0.AccessToken;
             g.ApiAddress = String2char("");
             Pointer list = Lib.INSTANCE.NewChar(1);
             Lib.INSTANCE.SetChar(list, 0, String2char("-XX:+UseG1GC"));
@@ -400,10 +434,10 @@ https://bmclapidoc.bangbang93.com/
             g.flag_len = 1;
             g.independent = 1;
             g.Minecraftpath = String2char("C:/Users/xmdhs/Desktop/新建文件夹/.minecraft");
-            g.Name = String2char("xmdhs");
-            g.UUID = String2char("9f51573a5ec545828c2b09f7f08497b1");
+            g.Name = ar.r0.Username;
+            g.UUID = ar.r0.UUID;
             g.RAM = 2000;
-            g.Version = String2char("1.0");
+            g.Version = String2char("1.17");
             GmlReturn r = Lib.INSTANCE.GenCmdArgs(g);
             if (r.r2.r0 != 0) {
                 System.out.println(r.r2.r0 + ": " + r.r2.r1.getString(0, StandardCharsets.UTF_8.name()));
@@ -436,7 +470,6 @@ https://bmclapidoc.bangbang93.com/
 
         }
     }
-
 ## 下载
 其实推荐自行编译。需要安装 golang https://golang.google.cn/ 和 gcc 或者 clang （windows 下不能用 clang）。
 
