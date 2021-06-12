@@ -1,7 +1,7 @@
 ## gml-c-shared
 简单说就是一个启动器库，可以以此简单的启动游戏和补全游戏文件。
 
-是对于 [gomclauncher](https://github.com/xmdhs/gomclauncher) 的封装，导出为 c 语言的 api 的动态链接库。大概大多数语言都能很好的调用。  
+是对于 [gomclauncher](https://github.com/xmdhs/gomclauncher) 的封装，导出为 c 语言的动态链接库。大概大多数语言都能很好的调用。  
 
 ## 开源地址
 mit 协议开源
