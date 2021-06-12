@@ -434,6 +434,6 @@ https://bmclapidoc.bangbang93.com/
 
 然后在项目内执行 go build -trimpath -ldflags "-w -s -linkmode \"external\" -extldflags \"-static -O3\"" -buildmode=c-shared -o libgml.dll
 
-就可以看到 libgml.dll 和 libgml.h，后缀重要，可以自己改的。
+就可以看到 libgml.dll 和 libgml.h，后缀不重要，可以自己改的。
 
 已经编译好的
