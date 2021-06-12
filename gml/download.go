@@ -90,7 +90,7 @@ func (f Down) d(cxt context.Context) error {
 	if err != nil {
 		return fmt.Errorf("down.d: %w", err)
 	}
-	err = l.Downjson(cxt, f.download, f.Fail)
+	err = l.Downjson(cxt, f.download, f.Minecraftpath, f.Fail)
 	if !(f.run != "" && err != nil && errors.Is(err, download.NoSuch)) {
 		if err != nil {
 			return fmt.Errorf("down.d: %w", err)
@@ -105,7 +105,7 @@ func (f Down) d(cxt context.Context) error {
 	if err != nil {
 		return fmt.Errorf("down.d: %w", err)
 	}
-	dl, err := download.Newlibraries(cxt, b, f.Atype, f.Fail)
+	dl, err := download.Newlibraries(cxt, b, f.Atype, f.Fail, f.Minecraftpath)
 	if err != nil {
 		return fmt.Errorf("down.d: %w", err)
 	}
