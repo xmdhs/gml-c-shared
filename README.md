@@ -22,9 +22,10 @@ forge 等自动安装          | × [2]
 
 ## 注意事项
 返回的 char* 和 char** 类型是分配在堆上的，需要释放内存，可以使用
+
     char *a; 
     Freechar(a,0) 
-释放 char*
+释放 char\*
 
     char **a
     Freechar(a,长度)
