@@ -54,5 +54,6 @@ func DoFinish(f unsafe.Pointer) func(e Err) {
 		c.code = C.int(e.Code)
 		c.msg = (*C.char)(e.Msg)
 		C.do_finish(f, c)
+		C.free(unsafe.Pointer(e.Msg))
 	}
 }
