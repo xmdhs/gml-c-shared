@@ -33,6 +33,8 @@ typedef void (*Fail)(char*);
 
 typedef void (*Ok)(int,int);
 
+typedef void (*gmlfinish)(err);
+
 typedef struct
 {
     char *Username;
@@ -52,6 +54,7 @@ typedef struct
 import "C"
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"net/url"
@@ -131,17 +134,32 @@ func SetProxy(httpProxy *C.char) C.err {
 }
 
 //export Download
-func Download(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok C.Ok) C.err {
+func Download(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok C.Ok, finish C.gmlfinish) C.longlong {
 	d := gml.NewDown(C.GoString(Type), C.GoString(Minecraftpath), int(downInt), c.DoFail(unsafe.Pointer(fail)), c.DoOk(unsafe.Pointer(ok)))
-	err := d.Download(C.GoString(version))
-	return errr(err)
+	return downcheck(version, finish, d.Download)
+}
+
+func downcheck(version *C.char, finish C.gmlfinish, do func(cxt context.Context, version string) error) C.longlong {
+	cxt, i := gcancel.new()
+	go func() {
+		err := do(cxt, C.GoString(version))
+		f := c.DoFinish(unsafe.Pointer(finish))
+		e := errr(err)
+		f(c.Err{Code: int(e.code), Msg: unsafe.Pointer(e.msg)})
+		gcancel.del(i)
+	}()
+	return C.longlong(i)
 }
 
 //export Check
-func Check(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok C.Ok) C.err {
+func Check(version, Type, Minecraftpath *C.char, downInt C.int, fail C.Fail, ok C.Ok, finish C.gmlfinish) C.longlong {
 	d := gml.NewDown(C.GoString(Type), C.GoString(Minecraftpath), int(downInt), c.DoFail(unsafe.Pointer(fail)), c.DoOk(unsafe.Pointer(ok)))
-	err := d.Check(C.GoString(version))
-	return errr(err)
+	return downcheck(version, finish, d.Check)
+}
+
+//export Cancel
+func Cancel(id C.longlong) {
+	gcancel.do(int64(id))
 }
 
 //export ListVersion

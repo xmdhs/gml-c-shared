@@ -42,3 +42,17 @@ func DoOk(f unsafe.Pointer) func(int, int) {
 		C.do_Ok(f, C.int(i1), C.int(i2))
 	}
 }
+
+type Err struct {
+	Code int
+	Msg  unsafe.Pointer
+}
+
+func DoFinish(f unsafe.Pointer) func(e Err) {
+	return func(e Err) {
+		c := C.err{}
+		c.code = C.int(e.Code)
+		c.msg = (*C.char)(e.Msg)
+		C.do_finish(f, c)
+	}
+}

@@ -42,17 +42,17 @@ func NewDown(Type, Minecraftpath string, downInt int, Fail func(string), Ok func
 	}
 }
 
-func (d *Down) Download(version string) error {
+func (d *Down) Download(cxt context.Context, version string) error {
 	d.download = version
 	d.run = ""
-	err := d.d()
+	err := d.d(cxt)
 	if err != nil {
 		return fmt.Errorf("down.Download: %w", err)
 	}
 	return nil
 }
 
-func (d *Down) Check(version string) error {
+func (d *Down) Check(cxt context.Context, version string) error {
 	d.download = version
 	d.run = version
 
@@ -75,19 +75,17 @@ func (d *Down) Check(version string) error {
 	}
 	if t.InheritsFrom != "" {
 		d.download = t.InheritsFrom
-		err = d.d()
 	} else {
 		d.download = version
-		err = d.d()
 	}
+	err = d.d(cxt)
 	if err != nil {
 		return fmt.Errorf("down.Check: %w", err)
 	}
 	return nil
 }
 
-func (f Down) d() error {
-	cxt := context.TODO()
+func (f Down) d(cxt context.Context) error {
 	l, err := download.Getversionlist(cxt, f.Atype, f.Fail)
 	if err != nil {
 		return fmt.Errorf("down.d: %w", err)

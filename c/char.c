@@ -39,3 +39,10 @@ void do_Ok(void *f, int i1, int i2)
     ok = f;
     ok(i1, i2);
 }
+
+void do_finish(void *f, err e)
+{
+    void (*gmlfinish)(err);
+    gmlfinish = f;
+    gmlfinish(e);
+}

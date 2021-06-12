@@ -59,6 +59,9 @@ code | msg
 */
 typedef void (*Ok)(int,int);
 
+//下载或检查游戏，成功或失败时，将调用此函数
+typedef void (*gmlfinish)(err);
+
 typedef struct
 {
     char *Username;
@@ -95,9 +98,12 @@ extern err SetProxy(char* httpProxy);
 //version 下载版本，可通过 ListDownloadVersion 查找可下载的版本
 //Type 下载使用的下载源，留空将按照权重的随机使用三个下载源，也可以自行设置。例如 vanilla|bmclapi 表示随机使用原版下载源和 bmclapi 下载源。mcbbs 表示只使用 mcbbs 下载源
 //Minecraftpath 下载的路径，例如 D:/mc/.minecraft
-extern err Download(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok);
+//调用后将立刻返回一个 int64，可以使用 Cancel 函数，将此 int64 传入，取消下载操
+extern long long int Download(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok, gmlfinish finish);
 //检查游戏的完整性，第一次某个版本时，必须检查一次。
-extern err Check(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok);
+extern long long int Check(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok, gmlfinish finish);
+//取消下载或者检查游戏完整性
+extern void Cancel(long long int id);
 //列出可启动版本
 //path 例如 D:/mc/.minecraft/version
 extern GmlReturn ListVersion(char* path);
