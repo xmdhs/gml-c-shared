@@ -104,8 +104,6 @@ extern err SetProxy(char* httpProxy);
 //Minecraftpath 下载的路径，例如 D:/mc/.minecraft
 //调用后将立刻返回一个 int64，可以使用 Cancel 函数，将此 int64 传入，取消下载操
 extern long long int Download(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok, gmlfinish finish);
-//downInt 下载使用的协程数，通常 64 即可，因为每一个文件只使用了一个协程，多了虽然性能上没啥问题但是没意义。
-extern err Download(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok);
 //检查游戏的完整性，第一次某个版本时，必须检查一次。
 extern long long int Check(char* version, char* Type, char* Minecraftpath, int downInt, Fail fail, Ok ok, gmlfinish finish);
 //取消下载或者检查游戏完整性
