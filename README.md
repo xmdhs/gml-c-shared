@@ -22,9 +22,10 @@ forge 等自动安装          | × [2]
 
 ## 注意事项
 返回的 char* 和 char** 类型是分配在堆上的，需要释放内存，可以使用
+
     char *a; 
     Freechar(a,0) 
-释放 char*
+释放 char\*
 
     char **a
     Freechar(a,长度)
@@ -87,6 +88,7 @@ https://bmclapidoc.bangbang93.com/
     /*code | msg
     -----|----------------------------------------------
     -1   | 未知错误
+    0    | 正常
     1    | 文件不存在
     2    | json 错误
     3    | minecraft json 格式错误
@@ -438,8 +440,8 @@ https://bmclapidoc.bangbang93.com/
 ## 下载
 其实推荐自行编译。需要安装 golang https://golang.google.cn/ 和 gcc 或者 clang （windows 下不能用 clang）。
 
-然后在项目内执行 go build -trimpath -ldflags "-w -s -linkmode \"external\" -extldflags \"-static -O3\"" -buildmode=c-shared -o libgml.dll
+然后在项目内执行 go build -trimpath -ldflags "-w -s" -buildmode=c-shared -o libgml.dll
 
-就可以看到 libgml.dll 和 libgml.h，后缀重要，可以自己改的。
+就可以看到 libgml.dll 和 libgml.h，后缀不重要，可以自己改的。
 
 已经编译好的
