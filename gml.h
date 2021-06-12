@@ -29,12 +29,30 @@ typedef struct
 
 typedef struct
 {
-    //code 对应的信息见 err.md
+    //code 对应的信息见下方注释
     int  code;
     //详细的错误信息
     char *msg;
 } err;
 
+/*code | msg
+-----|----------------------------------------------
+-1   | 未知错误
+1    | 文件不存在
+2    | json 错误
+3    | minecraft json 格式错误
+4    | 找不到该版本
+5    | 下载失败次数过多
+6    | authlib 登录时，有多个账户，且并没有选择（也就是没有设置 username 参数）
+7    | 没有这个角色
+8    | 通常是密码错误，或者登录过期
+9    | authlib 找不到可用档案，也就是没有创建角色之类的
+10   | accessToken 失效
+11   | 登录微软账户时打开的浏览器中，打开了其他页面
+12   | 尝试重新登录微软账户
+13   | 没有购买游戏或者没有迁移账号
+14   | 没有安装 chrome 或者新版本的 edge（windows only）
+*/
 
 typedef struct
 {
@@ -93,6 +111,8 @@ extern void Freechar(char** charlist, long long int len);
 extern char** NewChar(long long int len);
 //设置字符串数组指定的位置的字符串
 extern void SetChar(char** cc, long long int index, char* achar);
+//其实就是导出了 c 语言的 malloc 函数，为了避免变量名冲突，所以首字母大写了
+extern void* Malloc(int i);
 //生成启动游戏需要的参数
 extern GmlReturn GenCmdArgs(Gameinfo g);
 //设置下载文件和正版登录的代理，非线程安全，全局共用

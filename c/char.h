@@ -23,4 +23,6 @@ void do_Ok(void *f, int i1, int i2);
 
 void do_finish(void *f,err e);
 
+void* GoMalloc(int i);
+
 #endif

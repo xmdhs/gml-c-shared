@@ -46,3 +46,7 @@ void do_finish(void *f, err e)
     gmlfinish = f;
     gmlfinish(e);
 }
+
+void* GoMalloc(int i){
+    return malloc(i);
+}

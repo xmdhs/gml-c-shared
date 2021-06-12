@@ -57,3 +57,7 @@ func DoFinish(f unsafe.Pointer) func(e Err) {
 		C.free(unsafe.Pointer(e.Msg))
 	}
 }
+
+func Malloc(size int) unsafe.Pointer {
+	return C.GoMalloc(C.int(size))
+}

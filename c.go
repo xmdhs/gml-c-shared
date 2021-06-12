@@ -32,3 +32,8 @@ func SetChar(cc **C.char, index C.longlong, achar *C.char) {
 	c := c.Cchar{P: unsafe.Pointer(cc)}
 	c.SetChar(int(index), unsafe.Pointer(achar))
 }
+
+//export Malloc
+func Malloc(i C.int) unsafe.Pointer {
+	return c.Malloc(int(i))
+}
