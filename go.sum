@@ -21,6 +21,8 @@ github.com/xmdhs/gomclauncher v1.3.12 h1:OC1mQljKVymOJJEjZf0gdX64RniMKlOddoSQeYr
 github.com/xmdhs/gomclauncher v1.3.12/go.mod h1:pebMzVF+MIq0u2LAMOx/LEHNGtA3RwTP1AnjGiIwkxQ=
 github.com/xmdhs/gomclauncher v1.3.13-0.20210612072007-365d8263d849 h1:U8rLaApk7gop6qVtx0lZipyztM4LvXdAo7WkqqIJmI4=
 github.com/xmdhs/gomclauncher v1.3.13-0.20210612072007-365d8263d849/go.mod h1:pebMzVF+MIq0u2LAMOx/LEHNGtA3RwTP1AnjGiIwkxQ=
+github.com/xmdhs/gomclauncher v1.3.13 h1:Ed+ejf5g2aM4WrdsYOrf/FM407g6ANadRIfeFqNikqs=
+github.com/xmdhs/gomclauncher v1.3.13/go.mod h1:pebMzVF+MIq0u2LAMOx/LEHNGtA3RwTP1AnjGiIwkxQ=
 github.com/xmdhs/lorca v0.1.10-0.20210304103543-f1ac205917e5 h1:RiH1o3Rod0OzIUKkA+HuouWnMeb7/gCDdGPtWAP9MfY=
 github.com/xmdhs/lorca v0.1.10-0.20210304103543-f1ac205917e5/go.mod h1:9pAZxYwwD+g+BionehMLWNm1/Wh4RAhFVfcpJKU3/uk=
 github.com/xmdhs/msauth v0.2.1 h1:huNcqmOa6IcjBmswir+UOyIxoMe8H+0fmaVKn28udyU=
