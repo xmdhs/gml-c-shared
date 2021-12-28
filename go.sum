@@ -21,8 +21,8 @@ github.com/smartystreets/goconvey v1.6.7/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/xmdhs/gomclauncher v1.4.6 h1:yPYbqW5OY0Vv3vq6m7zNHPrDmR18+T0hgbKhxTiqBok=
-github.com/xmdhs/gomclauncher v1.4.6/go.mod h1:qQKv1auvUpSzPySPsWpu2SP0T69Gvy8KxcvCZHJSP2E=
+github.com/xmdhs/gomclauncher v1.4.7 h1:qC9YrDeVoaglCssEiJzFecNdYKIAx0rsxm22mTF3w9U=
+github.com/xmdhs/gomclauncher v1.4.7/go.mod h1:qQKv1auvUpSzPySPsWpu2SP0T69Gvy8KxcvCZHJSP2E=
 github.com/xmdhs/lorca v0.1.10-0.20210304103543-f1ac205917e5 h1:RiH1o3Rod0OzIUKkA+HuouWnMeb7/gCDdGPtWAP9MfY=
 github.com/xmdhs/lorca v0.1.10-0.20210304103543-f1ac205917e5/go.mod h1:9pAZxYwwD+g+BionehMLWNm1/Wh4RAhFVfcpJKU3/uk=
 github.com/xmdhs/msauth v0.2.1 h1:huNcqmOa6IcjBmswir+UOyIxoMe8H+0fmaVKn28udyU=
